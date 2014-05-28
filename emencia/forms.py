@@ -32,6 +32,9 @@ class MailingListSubscriptionForm(forms.ModelForm):
         mailing_list.subscribers.add(contact)
         mailing_list.unsubscribers.remove(contact)
 
+        if created:
+			return contact
+
     class Meta:
         model = Contact
         fields = ('full_name',)
