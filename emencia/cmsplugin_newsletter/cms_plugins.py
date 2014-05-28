@@ -7,6 +7,7 @@ from cms.plugin_pool import plugin_pool
 from emencia.cmsplugin_newsletter import settings
 from emencia.cmsplugin_newsletter.models import SubscriptionFormPlugin
 from emencia.forms import MailingListSubscriptionForm
+from emencia.signals import contact_subscribed
 
 
 class CMSSubscriptionFormPlugin(CMSPluginBase):
@@ -22,7 +23,8 @@ class CMSSubscriptionFormPlugin(CMSPluginBase):
         if request.method == "POST" and (settings.FORM_NAME in request.POST.keys()):
             form = MailingListSubscriptionForm(data=request.POST)
             if form.is_valid():
-                form.save(instance.mailing_list)
+                contact = form.save(instance.mailing_list)
+                contact_subscribed.send(sender=self, contact=contact, request=request)
                 form.saved = True
         else:
             form = MailingListSubscriptionForm()
